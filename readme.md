@@ -2,6 +2,8 @@
 
 Kotlin编写的ORM框架,侧重自动创表(实体类自动创表)功能
 
+> 目前处于测试阶段,具体结构还在思索,所以下述的相关API在之后可能会有所变动!!
+
 ## 起因
 原本也不想重复造轮子,但发现目前现有的ORM框架,只有JPA这个框架支持自动创表,且
 
@@ -23,4 +25,51 @@ Kotlin编写的ORM框架,侧重自动创表(实体类自动创表)功能
 
 目前暂定支持H2DataBase
 ## 使用
-待补充
+### 1.定义数据类
+
+> 注意:**参数需要使用`var`关键字**,因为用查询是用反射初始化的,定义为val会导致实例初始化失败!!
+
+```kotlin
+data class ItemData(var file: File, var dirName: String, var fileName: String, var url: String, var downloadLink: String, var fileSize: String, var time: String)
+```
+
+目前测试是支持String,Int和File类型(其实File类型入库也是String类型)
+
+### 2.初始化
+```kotlin
+val kclass =ItemData::class
+
+val dbUrl = "jdbc:h2:D:/temp/h2db/test"
+val user = ""
+val pwd = ""
+
+val kxDbConnConfig = KxDbConnConfig(dbUrl, user, pwd).registerClass(kclass)
+KxDb.init(kxDbConnConfig)
+```
+
+需要使用KxDbConnConfig对象的`registerClass`方法进行数据类的注册
+
+之后调用`KxDb.init()`进行初始化,此步包含了创表的操作(如果库中表不存在)
+
+> 由于是使用的H2DataBase,数据库不存在会自动进行创建
+
+### 3.插入
+```kotlin
+//插入3条数据
+repeat(3) {
+    val data = ItemData(File("D:\\temp\\myd.png"),"D:\\temp","myd.png","https://xx.com","https://jkjk","20.4MB","2020-12-2$it")
+    KxDb.insert(data)
+}
+```
+
+使用`KxDb.insert()`方法插入数据
+
+### 4.查询
+```kotlin
+//查询
+val queryList = KxDb.getQueryList(ItemData::class)
+println(queryList.toString())
+```
+目前只可以查询全部数据,条件查询还未实现,需要些时间思考些怎么实现比较优雅,敬请期待
+
+
