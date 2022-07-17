@@ -26,7 +26,7 @@ object OrmFunQuery {
      * @param kclass
      * @return
      */
-    fun <T : Any> getQueryList(resultSet: JdbcResultSet, kclass: KClass<T>): List<T> {
+    private fun <T : Any> getQueryList(resultSet: JdbcResultSet, kclass: KClass<T>): List<T> {
         val map = hashMapOf<String, Pair<KType, KMutableProperty<Any>>>()
 
         val defaultValueList = arrayListOf<Any>()
@@ -82,7 +82,7 @@ object OrmFunQuery {
      * @param fileNameType Pair<String,KClass<out T> 字段的名及字段类型
      * @return
      */
-    fun <T : Any> getFieldValue(resultSet: JdbcResultSet, fileNameType: Pair<String, KClass<out T>>): T? {
+    private fun <T : Any> getFieldValue(resultSet: JdbcResultSet, fileNameType: Pair<String, KClass<out T>>): T? {
         val fieldName = fileNameType.first
         val kclass = fileNameType.second
         val method = getMethod(resultSet::class, kclass)
@@ -98,7 +98,7 @@ object OrmFunQuery {
      * @param kClass
      * @return
      */
-    fun <T : Any> getMethod(resultSetKclass: KClass<out JdbcResultSet>, kClass: KClass<out T>): KFunction<T>? {
+    private fun <T : Any> getMethod(resultSetKclass: KClass<out JdbcResultSet>, kClass: KClass<out T>): KFunction<T>? {
         val methodName = when {
             kClass == String::class -> "getString"
             kClass == Int::class -> "getInt"
@@ -120,6 +120,13 @@ object OrmFunQuery {
 
     }
 
+    /**
+     * 查询列表数据
+     *
+     * @param conn
+     * @param kclass
+     * @return
+     */
     fun <T : Any> queryListByClass(conn: Connection, kclass: KClass<T>): List<T> {
         val statement = conn.createStatement()
         // 查询数据

@@ -12,14 +12,14 @@ import kotlin.reflect.KClass
  * @param pwd 数据库密码
  */
 class KxDbConnConfig(val url: String, val user: String, val pwd: String) {
-    val registerClassList = arrayListOf<KClass<Any>>()
+    val registerClassList = arrayListOf<KClass<out Any>>()
 
     /**
      * 注册实体类
      *
      * @param kClassArr
      */
-    fun registerClass(vararg kClassArr: KClass<Any>): KxDbConnConfig {
+    fun registerClass(vararg kClassArr: KClass<out Any>): KxDbConnConfig {
         registerClassList.addAll(kClassArr.toList())
         return this
     }

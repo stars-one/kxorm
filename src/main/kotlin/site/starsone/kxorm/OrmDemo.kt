@@ -2,8 +2,8 @@ package site.starsone.kxorm
 
 import org.h2.jdbc.JdbcResultSet
 import site.starsone.kxorm.crud.OrmFunCreate
-import site.starsone.kxorm.crud.OrmFunInsert
-import site.starsone.kxorm.crud.OrmFunQuery
+import site.starsone.kxorm.db.KxDb
+import site.starsone.kxorm.db.KxDbConnConfig
 import java.io.File
 import java.sql.DriverManager
 import kotlin.reflect.full.createType
@@ -20,28 +20,31 @@ import kotlin.reflect.full.withNullability
  */
 fun main() {
 
+
     val kclass =ItemData::class
 
     val dbUrl = "jdbc:h2:D:/temp/h2db/test"
     val user = ""
     val pwd = ""
 
-    val conn = DriverManager.getConnection(dbUrl, user, pwd)
-    if (!OrmFunCreate.isTableExist(conn, kclass.simpleName!!)) {
-        //创表
-        OrmFunCreate.createTableByClass(conn, kclass)
-    }
+    val kxDbConnConfig = KxDbConnConfig(dbUrl, user, pwd).registerClass(kclass)
+    KxDb.init(kxDbConnConfig)
+
 
     //插入
-    repeat(3) {
-        val data = ItemData(File("D:\\temp\\myd.png"),"D:\\temp","myd.png","https://xx.com","https://jkjk","20.4MB","2020-12-1$it")
-        OrmFunInsert.insert(conn,data)
-    }
+//    repeat(3) {
+//        val data = ItemData(File("D:\\temp\\myd.png"),"D:\\temp","myd.png","https://xx.com","https://jkjk","20.4MB","2020-12-2$it")
+//        KxDb.insert(data)
+//    }
 
     //查询
-    val queryListByClass = OrmFunQuery.queryListByClass(conn, kclass)
-    println(queryListByClass.size)
-    println(queryListByClass.toString())
+    val queryList = KxDb.getQueryList(kclass)
+    println(queryList.toString())
+
+    val list = KxDb.getQueryList(Student::class)
+    println(list.toString())
+
+
 
 }
 
