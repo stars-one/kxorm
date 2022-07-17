@@ -1,11 +1,16 @@
 # Kxorm
 
+<meta name="referrer" content="no-referrer">
+
 Kotlin编写的ORM框架,侧重自动创表(实体类自动创表)功能
+
+<img src="https://jitpack.io/v/stars-one/kxorm.svg" />
 
 > 目前处于测试阶段,具体结构还在思索,所以下述的相关API在之后可能会有所变动!!
 
 ## 起因
-原本也不想重复造轮子,但发现目前现有的ORM框架,只有JPA这个框架支持自动创表,且
+原本也不想重复造轮子,但发现目前现有的ORM框架,只有JPA这个框架支持自动创表,且需要在Spring
+框架中才能使用,实在有些不方便,于是便是整个单独的简单的ORM框架出来
 
 这里提及的自动创表功能,解释一下:
 > 直接写对应的的实体类,之后由ORM自动创建对应的表,而不是由表再生成实体类
@@ -25,6 +30,21 @@ Kotlin编写的ORM框架,侧重自动创表(实体类自动创表)功能
 
 目前暂定支持H2DataBase
 ## 使用
+
+导入依赖
+
+```
+<dependency>
+    <groupId>com.github.stars-one</groupId>
+    <artifactId>kxorm</artifactId>
+    <version>0.1</version>
+</dependency>
+```
+或
+
+```
+implementation 'com.github.stars-one:kxorm:Tag'
+```
 ### 1.定义数据类
 
 > 注意:**参数需要使用`var`关键字**,因为用查询是用反射初始化的,定义为val会导致实例初始化失败!!
