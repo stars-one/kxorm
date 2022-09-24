@@ -7,6 +7,7 @@ import site.starsone.kxorm.condition.gt
 import site.starsone.kxorm.db.KxDb
 import site.starsone.kxorm.db.KxDbConnConfig
 import java.io.File
+import java.util.*
 
 
 class KxOrmTest {
@@ -46,6 +47,7 @@ class KxOrmTest {
     fun testCreateAndInsert() {
         initDb()
         val data = ItemData(
+            "122",
             File("D:\\temp\\myd.png"),
             "D:\\temp",
             12
@@ -85,14 +87,27 @@ class KxOrmTest {
      */
     @Test
     fun delete() {
-        val data = ItemData(File("D:\\temp"),"mydirName11",20)
+        val data = ItemData("232",File("D:\\temp"),"mydirName11",20)
         KxDb.insert(data)
         val row = KxDb.delete(ItemData::class){
-            ItemData::dirName eq "mydirName11"
+            ItemData::dataId eq "232"
         }
         assert(row==1)
     }
 
+    @Test
+    fun update() {
+
+        val dataId = UUID.randomUUID().toString()
+        val data = ItemData(dataId,File("D:\\temp"),"mydirName11",20)
+        KxDb.insert(data)
+
+        data.myCount = 45
+        val row = KxDb.updateForce(data){
+            ItemData::dataId eq dataId
+        }
+        assert(row==1)
+    }
 
 
 

@@ -10,6 +10,7 @@ import java.io.File
  */
 
 data class ItemData(
+    var dataId:String,
     var file: File,
     var dirName: String,
     var myCount:Int
