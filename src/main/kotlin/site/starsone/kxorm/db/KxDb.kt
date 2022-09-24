@@ -63,8 +63,7 @@ class KxDb {
          * @return
          */
         fun <T : Any> update(data: T): Int {
-            //todo Orm更新数据实现
-            TODO()
+            TODO("Orm更新数据实现")
         }
 
         /**

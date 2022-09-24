@@ -46,4 +46,8 @@ object OrmFunInsert {
         statement.close()
         return rows
     }
+
+    fun <T : Any> insert(conn: Connection, data: List<T>): Int {
+        TODO("批量插入数据")
+    }
 }
