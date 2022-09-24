@@ -2,6 +2,7 @@ package site.starsone.kxorm
 
 import org.junit.Test
 import site.starsone.kxorm.bean.ItemData
+import site.starsone.kxorm.condition.eq
 import site.starsone.kxorm.condition.gt
 import site.starsone.kxorm.db.KxDb
 import site.starsone.kxorm.db.KxDbConnConfig
@@ -77,6 +78,21 @@ class KxOrmTest {
         println("myCount大于10: $list")
         assert(list.isNotEmpty())
     }
+
+    /**
+     * 根据条件查询列表
+     *
+     */
+    @Test
+    fun delete() {
+        val data = ItemData(File("D:\\temp"),"mydirName11",20)
+        KxDb.insert(data)
+        val row = KxDb.delete(ItemData::class){
+            ItemData::dirName eq "mydirName11"
+        }
+        assert(row==1)
+    }
+
 
 
 
