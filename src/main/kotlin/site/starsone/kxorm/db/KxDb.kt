@@ -151,6 +151,22 @@ class KxDb {
         }
 
         /**
+         * 删除实体类
+         * @param T
+         * @param kclass
+         * @param lambda
+         * @receiver
+         * @return
+         */
+        fun <T : Any> delete(kclass: KClass<T>, condition: String): Int {
+            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+                return OrmFunDelete.delete(connection, kclass, condition)
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+        }
+
+        /**
          * 删除表的所有数据
          *
          * @param T
