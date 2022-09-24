@@ -1,5 +1,6 @@
 package site.starsone.kxorm.db
 
+import site.starsone.kxorm.condition.ConditionWhere
 import site.starsone.kxorm.crud.OrmFunCreate
 import site.starsone.kxorm.crud.OrmFunInsert
 import site.starsone.kxorm.crud.OrmFunQuery
@@ -75,12 +76,65 @@ class KxDb {
          * @return
          */
         fun <T : Any> getQueryList(kclass: KClass<T>): List<T> {
+            //判断是否类已被注册
             if (kxDbConnConfig.registerClassList.contains(kclass)) {
                 return OrmFunQuery.queryListByClass(connection, kclass)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
             }
         }
+
+        /**
+         * 根据条件,获取数据列表
+         *
+         * @param T
+         * @param kclass 实体类class
+         * @param lambda 传递单条件lambda,如Student.class::name eq "john"
+         * @receiver
+         * @return
+         */
+        fun <T : Any> getQueryListByCondition(kclass: KClass<T>, lambda: () -> ConditionWhere<out Any>): List<T> {
+            val condition = lambda.invoke()
+            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+                return OrmFunQuery.queryListByCondition(connection, kclass,condition.toSql())
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+        }
+
+        /**
+         * 根据条件,获取数据列表
+         *
+         * @param T
+         * @param kclass 实体类class
+         * @param lambda 条件where语句(不用含where关键字)
+         * @receiver
+         * @return
+         */
+        fun <T : Any> getQueryListByCondition(kclass: KClass<T>, condition:String): List<T> {
+            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+                return OrmFunQuery.queryListByCondition(connection, kclass,condition)
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+        }
+
+        /**
+         * 获取查询后的实体列表数据
+         *
+         * @param T
+         * @param resultSet
+         * @param kclass
+         * @return
+         */
+        /*fun <T : Any> getQueryListByCondition(kclass: KClass<T>,lambda:()->List<ConditionWhere<out Any>>): List<T> {
+            TODO("多条件如何实现??")
+            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+                return OrmFunQuery.queryListByClass(connection, kclass)
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+        }*/
 
     }
 }

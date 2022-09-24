@@ -32,7 +32,9 @@ object OrmFunQuery {
         val defaultValueList = arrayListOf<Any>()
         kclass.primaryConstructor?.parameters?.forEach {
             map[it.name!!] =
-                Pair(it.type, kclass.declaredMemberProperties.find { pro -> pro.name == it.name } as KMutableProperty<Any>)
+                Pair(
+                    it.type,
+                    kclass.declaredMemberProperties.find { pro -> pro.name == it.name } as KMutableProperty<Any>)
             if (it.type == String::class.starProjectedType) {
                 defaultValueList.add("")
             }
@@ -58,7 +60,7 @@ object OrmFunQuery {
                     val result = getFieldValue(resultSet, t.toFileNameType(String::class))
                     kMutableProperty.setter.call(dataClassObject, File(result))
                 }
-                if (type == String::class.starProjectedType ) {
+                if (type == String::class.starProjectedType) {
                     val result = getFieldValue(resultSet, t.toFileNameType(String::class))
                     kMutableProperty.setter.call(dataClassObject, result)
                 }
@@ -132,6 +134,24 @@ object OrmFunQuery {
         // 查询数据
 
         val resultSet = statement.executeQuery("select * from ${kclass.simpleName}") as JdbcResultSet
+        val queryList = getQueryList(resultSet, kclass)
+        return queryList
+    }
+
+    /**
+     * 查询列表数据
+     *
+     * @param conn
+     * @param kclass
+     * @return
+     */
+    fun <T : Any> queryListByCondition(conn: Connection, kclass: KClass<T>, condition: String): List<T> {
+        val statement = conn.createStatement()
+        // 查询数据
+
+        val sql = "select * from ${kclass.simpleName} where $condition"
+        println("查询的sql语句: ${sql}")
+        val resultSet = statement.executeQuery(sql) as JdbcResultSet
         val queryList = getQueryList(resultSet, kclass)
         return queryList
     }
