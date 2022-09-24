@@ -41,6 +41,7 @@ object OrmFunInsert {
         val sql = """
         INSERT INTO ${kclass.simpleName} ( ${paramStr}) VALUES(${valueStr})
     """.trimIndent()
+        println("插入语句: $sql")
         val statement = conn.createStatement()
         val rows = statement.executeUpdate(sql)
         statement.close()
