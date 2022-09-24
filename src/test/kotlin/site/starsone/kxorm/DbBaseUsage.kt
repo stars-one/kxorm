@@ -12,7 +12,7 @@ import kotlin.reflect.full.withNullability
  * @author StarsOne
  * @date Create in  2022/09/24 14:04
  */
-fun createDbAndQuery() {
+fun main() {
     val dbUrl = "jdbc:h2:D:/temp/h2db/test"
     val user = ""
     val pwd = ""
