@@ -32,7 +32,4 @@ jobs:
           release_name: Release ${{ github.ref }}
           body: ${{ steps.changelog.outputs.changes }}
           
-      - name: publish jitpack
-        uses: badasintended/autojitpack@v1
-        with:
-          version: ${{ github.event.release.tag_name }}
+   
