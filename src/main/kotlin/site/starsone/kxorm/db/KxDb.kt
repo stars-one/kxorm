@@ -1,10 +1,7 @@
 package site.starsone.kxorm.db
 
 import site.starsone.kxorm.condition.ConditionWhere
-import site.starsone.kxorm.crud.OrmFunCreate
-import site.starsone.kxorm.crud.OrmFunDelete
-import site.starsone.kxorm.crud.OrmFunInsert
-import site.starsone.kxorm.crud.OrmFunQuery
+import site.starsone.kxorm.crud.*
 import java.sql.Connection
 import kotlin.reflect.KClass
 
@@ -170,9 +167,29 @@ class KxDb {
          * @param bean
          * @return
          */
-        fun <T : Any> delete(bean:T): Int {
+        fun <T : Any> delete(bean: T): Int {
             TODO("删除某个表")
         }
+
+        /**
+         * 更新实体类
+         *
+         * @param T
+         * @param bean
+         * @return
+         */
+        fun <T : Any> updateForce(bean: T, lambda: () -> ConditionWhere<out Any>): Int {
+            val condition = lambda.invoke()
+            val kclass = bean::class
+
+            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+                return OrmFunUpdate.updateForce(connection, bean, condition)
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+
+        }
+
 
     }
 }
