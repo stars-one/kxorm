@@ -2,6 +2,7 @@ package site.starsone.kxorm.db
 
 import site.starsone.kxorm.condition.ConditionWhere
 import site.starsone.kxorm.crud.OrmFunCreate
+import site.starsone.kxorm.crud.OrmFunDelete
 import site.starsone.kxorm.crud.OrmFunInsert
 import site.starsone.kxorm.crud.OrmFunQuery
 import java.sql.Connection
@@ -95,7 +96,7 @@ class KxDb {
         fun <T : Any> getQueryListByCondition(kclass: KClass<T>, lambda: () -> ConditionWhere<out Any>): List<T> {
             val condition = lambda.invoke()
             if (kxDbConnConfig.registerClassList.contains(kclass)) {
-                return OrmFunQuery.queryListByCondition(connection, kclass,condition.toSql())
+                return OrmFunQuery.queryListByCondition(connection, kclass, condition.toSql())
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
             }
@@ -110,9 +111,9 @@ class KxDb {
          * @receiver
          * @return
          */
-        fun <T : Any> getQueryListByCondition(kclass: KClass<T>, condition:String): List<T> {
+        fun <T : Any> getQueryListByCondition(kclass: KClass<T>, condition: String): List<T> {
             if (kxDbConnConfig.registerClassList.contains(kclass)) {
-                return OrmFunQuery.queryListByCondition(connection, kclass,condition)
+                return OrmFunQuery.queryListByCondition(connection, kclass, condition)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
             }
@@ -134,6 +135,35 @@ class KxDb {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
             }
         }*/
+
+        /**
+         * 删除实体类
+         * @param T
+         * @param kclass
+         * @param lambda
+         * @receiver
+         * @return
+         */
+        fun <T : Any> delete(kclass: KClass<T>, lambda: () -> ConditionWhere<out Any>): Int {
+            val condition = lambda.invoke()
+            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+                return OrmFunDelete.delete(connection, kclass, condition.toSql())
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+        }
+
+        /**
+         * 删除表的所有数据
+         *
+         * @param T
+         * @param kclass
+         * @return
+         */
+        fun <T : Any> deleteAll(kclass: KClass<T>): Int {
+            return OrmFunDelete.deleteAll(connection, kclass)
+        }
+
 
     }
 }
