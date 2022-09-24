@@ -164,6 +164,15 @@ class KxDb {
             return OrmFunDelete.deleteAll(connection, kclass)
         }
 
+        /**
+         * 删除某个实体类
+         * @param T
+         * @param bean
+         * @return
+         */
+        fun <T : Any> delete(bean:T): Int {
+            TODO("删除某个表")
+        }
 
     }
 }
