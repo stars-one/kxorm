@@ -16,12 +16,15 @@ import kotlin.reflect.full.withNullability
  *
  */
 object OrmFunDelete {
+
     /**
-     * 删除单条数据
+     * 删除数据
      *
      * @param conn
      * @param kclass
-     * @return
+     * @param condition where条件语句(不用包含where关键字)
+     *
+     * @return 删除操作的影响行数
      */
     fun <T : Any> delete(conn: Connection, kclass: KClass<T>, condition: String): Int {
         val statement = conn.createStatement()
