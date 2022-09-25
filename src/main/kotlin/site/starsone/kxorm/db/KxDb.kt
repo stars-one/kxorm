@@ -135,6 +135,7 @@ class KxDb {
 
         /**
          * 删除实体类
+         *
          * @param T
          * @param kclass
          * @param lambda
@@ -184,7 +185,12 @@ class KxDb {
          * @return
          */
         fun <T : Any> delete(bean: T): Int {
-            TODO("删除某个表")
+            val kclass = bean::class
+            if (kxDbConnConfig.isClassRegister(bean::class)) {
+                return OrmFunDelete.delete(connection,bean)
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
         }
 
         /**

@@ -32,8 +32,17 @@ class TableInfo {
      * @param fieldName
      * @return
      */
-    fun getColumnByFieldName(fieldName: String):TableColumnInfo? {
-        return columns.firstOrNull() { it.fieldName==fieldName }
+    fun getColumnByFieldName(fieldName: String): TableColumnInfo? {
+        return columns.firstOrNull() { it.fieldName == fieldName }
+    }
+
+    /**
+     * 获取主键列信息(只考虑单主键的情况)
+     *
+     * @return
+     */
+    fun getPkColumnInfo(): TableColumnInfo? {
+        return columns.firstOrNull() { it.isPk }
     }
 }
 

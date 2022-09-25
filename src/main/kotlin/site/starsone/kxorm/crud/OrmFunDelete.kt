@@ -1,7 +1,12 @@
 package site.starsone.kxorm.crud
 
+import site.starsone.kxorm.db.KxDb
+import java.io.File
 import java.sql.Connection
 import kotlin.reflect.KClass
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.full.withNullability
 
 /**
  * 更新的相关方法工具类
@@ -38,10 +43,47 @@ object OrmFunDelete {
      */
     fun <T : Any> deleteAll(conn: Connection, kclass: KClass<T>): Int {
         val statement = conn.createStatement()
-        // 查询数据
+        // 删除数据
         val sql = "delete from ${kclass.simpleName}"
         println("删除sql语句: ${sql}")
         val rows = statement.executeUpdate(sql)
         return rows
+    }
+
+    /**
+     * 删除表的所有数据
+     *
+     * @param conn
+     * @param kclass
+     * @return
+     */
+    fun <T : Any> delete(conn: Connection,bean: T): Int {
+        val statement = conn.createStatement()
+        val kclass = bean::class
+        val tableInfo = KxDb.kxDbConnConfig.getTableInfoByClass(kclass)
+        val pkColumn = tableInfo?.getPkColumnInfo()
+        val kProperty = kclass.declaredMemberProperties.find { it.name==pkColumn?.fieldName }
+
+        if (kProperty != null) {
+            val whereCondition = if (kProperty.returnType.withNullability(false) == String::class.starProjectedType || kProperty.returnType.withNullability(
+                    false
+                ) == File::class.starProjectedType
+            ) {
+                //string类型和file类型需要特殊处理
+                """'${kProperty.getter.call(bean).toString()}'"""
+            } else {
+                kProperty.getter.call(bean).toString()
+            }
+
+            // 删除数据
+            val sql = "delete from ${tableInfo?.tableName} where ${pkColumn?.columnName} = ${whereCondition}"
+            println("删除sql语句: ${sql}")
+            val rows = statement.executeUpdate(sql)
+            return rows
+        } else {
+            println("删除失败,没有找到主键,请检查${kclass.qualifiedName}是否设置了主键注解!!")
+        }
+        return 0
+
     }
 }
