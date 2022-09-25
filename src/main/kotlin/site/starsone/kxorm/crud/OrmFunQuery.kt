@@ -1,6 +1,7 @@
 package site.starsone.kxorm.crud
 
 import org.h2.jdbc.JdbcResultSet
+import site.starsone.kxorm.db.KxDb
 import site.starsone.kxorm.toFileNameType
 import java.io.File
 import java.sql.Connection
@@ -31,7 +32,10 @@ object OrmFunQuery {
 
         val defaultValueList = arrayListOf<Any>()
         kclass.primaryConstructor?.parameters?.forEach {
-            map[it.name!!] =
+            val tableInfo = KxDb.kxDbConnConfig.getTableInfoByClass(kclass)
+            //取数据库实体信息保存的columnName,因为可能会出现实体类字段与数据库字段不同的情况
+            val keyName = tableInfo?.getColumnByFieldName(it.name!!)?.columnName?:""
+            map[keyName] =
                 Pair(
                     it.type,
                     kclass.declaredMemberProperties.find { pro -> pro.name == it.name } as KMutableProperty<Any>)
