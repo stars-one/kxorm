@@ -86,11 +86,9 @@ class KxOrmTest {
      */
     @Test
     fun delete() {
-        val data = ItemData("232",File("D:\\temp"),"mydirName11",20)
+        val data = ItemData("28832",File("D:\\temp"),"mydirName11",20)
         KxDb.insert(data)
-        val row = KxDb.delete(ItemData::class){
-            ItemData::dataId eq "232"
-        }
+        val row = KxDb.delete(data)
         assert(row==1)
     }
 
