@@ -2,7 +2,6 @@ package site.starsone.kxorm
 
 import org.junit.Test
 import site.starsone.kxorm.bean.ItemData
-import site.starsone.kxorm.condition.eq
 import site.starsone.kxorm.db.KxDb
 import site.starsone.kxorm.db.KxDbConnConfig
 import java.io.File
@@ -100,9 +99,7 @@ class KxOrmTest {
         KxDb.insert(data)
 
         data.myCount = 45
-        val row = KxDb.updateForce(data){
-            ItemData::dataId eq dataId
-        }
+        val row = KxDb.updateForce(data)
         assert(row==1)
     }
 
