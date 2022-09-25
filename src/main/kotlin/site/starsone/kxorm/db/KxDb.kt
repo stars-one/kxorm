@@ -182,18 +182,14 @@ class KxDb {
          * @param bean
          * @return
          */
-        fun <T : Any> updateForce(bean: T, lambda: () -> ConditionWhere<out Any>): Int {
-            val condition = lambda.invoke()
+        fun <T : Any> updateForce(bean: T): Int {
             val kclass = bean::class
-
             if (kxDbConnConfig.isClassRegister(kclass)) {
-                return OrmFunUpdate.updateForce(connection, bean, condition)
+                return OrmFunUpdate.updateForce(connection, bean)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
             }
-
         }
-
 
     }
 }
