@@ -1,5 +1,7 @@
 package site.starsone.kxorm.bean
 
+import site.starsone.kxorm.annotation.TableColumn
+import site.starsone.kxorm.annotation.TableColumnPk
 import java.io.File
 
 /**
@@ -10,6 +12,8 @@ import java.io.File
  */
 
 data class ItemData(
+    @TableColumnPk
+    @TableColumn("data_id")
     var dataId:String,
     var file: File,
     var dirName: String,

@@ -3,7 +3,6 @@ package site.starsone.kxorm
 import org.junit.Test
 import site.starsone.kxorm.bean.ItemData
 import site.starsone.kxorm.condition.eq
-import site.starsone.kxorm.condition.gt
 import site.starsone.kxorm.db.KxDb
 import site.starsone.kxorm.db.KxDbConnConfig
 import java.io.File
@@ -11,7 +10,6 @@ import java.util.*
 
 
 class KxOrmTest {
-
 
     /**
      * 数据库连接及账号密码
@@ -74,9 +72,10 @@ class KxOrmTest {
      */
     @Test
     fun queryListByCondition() {
-        val list = KxDb.getQueryListByCondition(ItemData::class){
-            ItemData::myCount gt 10
-        }
+        val list = KxDb.getQueryListByCondition(ItemData::class,"MYCOUNT > 10")
+//        val list = KxDb.getQueryListByCondition(ItemData::class){
+//            ItemData::myCount gt 10
+//        }
         println("myCount大于10: $list")
         assert(list.isNotEmpty())
     }
@@ -108,7 +107,6 @@ class KxOrmTest {
         }
         assert(row==1)
     }
-
 
 
 }
