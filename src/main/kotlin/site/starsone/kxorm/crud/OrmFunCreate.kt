@@ -1,12 +1,9 @@
 package site.starsone.kxorm.crud
 
-import site.starsone.kxorm.SqlParam
-import java.io.File
+import site.starsone.kxorm.bean.TableInfo
+import site.starsone.kxorm.db.KxDb
 import java.sql.Connection
 import kotlin.reflect.KClass
-import kotlin.reflect.KType
-import kotlin.reflect.full.primaryConstructor
-import kotlin.reflect.full.starProjectedType
 
 /**
  * 创表相关方法
@@ -17,45 +14,27 @@ import kotlin.reflect.full.starProjectedType
  */
 object OrmFunCreate {
     /**
-     * 创表语句
+     * 根据tableInfo信息生成创表sql
      *
-     * @param kclass
+     * @param tableInfo
      * @return
      */
-    fun createSql(kclass: KClass<out Any>): String {
-        //类转为具体对应创表sql
-
-        val map = hashMapOf<String, KType>()
-        kclass.primaryConstructor?.parameters?.forEach {
-            map[it.name!!] = it.type
-        }
-        println(map.toString())
-
-
-        val tableName = kclass.simpleName!!
-
+    fun createSqlByTableInfo(tableInfo: TableInfo): String {
+        val tableName = tableInfo.tableName
         val paramList = arrayListOf<Pair<String, String>>()
-
-        val sqlparm = SqlParam(tableName, paramList)
-
-
-        map.forEach { (t, v) ->
-            if (v == String::class.starProjectedType || v == File::class.starProjectedType) {
-                paramList.add(Pair(t, "varchar(500)"))
-            }
-            if (v == Int::class.starProjectedType) {
-                paramList.add(Pair(t, "INTEGER"))
-            }
-            //todo 其他类型的适配，转驼峰，注解，主键
+        tableInfo.columns.forEach {
+            val pair = Pair(it.columnName, it.columnType)
+            paramList.add(pair)
         }
 
-        val paramstring = sqlparm.paramList.joinToString {
+        val paramstring = paramList.joinToString {
             it.first + " " + it.second
         }
-        println(paramstring)
+
         val sql = """
-        CREATE TABLE ${sqlparm.tableName}( $paramstring )
-    """.trimIndent()
+            CREATE TABLE ${tableName}( $paramstring )
+         """.trimIndent()
+
         return sql
     }
 
@@ -66,11 +45,24 @@ object OrmFunCreate {
      * @param kclass
      */
     fun createTableByClass(conn: Connection, kclass: KClass<out Any>) {
+        createTableByClassName(conn,kclass.qualifiedName!!)
+    }
+
+    /**
+     * 根据类名创建表
+     *
+     * @param conn
+     * @param className 全类名
+     */
+    fun createTableByClassName(conn: Connection, className:String) {
         val statement = conn.createStatement()
-        val sql = createSql(kclass)
-        println("创表语句: $sql")
-        statement.executeUpdate(sql)
-        statement.close()
+        val tableInfo = KxDb.kxDbConnConfig.registerClassList[className]
+        if (tableInfo != null) {
+            val sql =  createSqlByTableInfo(tableInfo)
+            println("创表语句: $sql")
+            statement.executeUpdate(sql)
+            statement.close()
+        }
     }
 
     /**

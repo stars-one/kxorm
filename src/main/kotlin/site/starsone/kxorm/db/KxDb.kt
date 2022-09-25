@@ -31,9 +31,9 @@ class KxDb {
             val registerClassList = kxDbConnConfig.registerClassList
             registerClassList.forEach {
                 //判断表是否存在
-                if (!isTableExist(it.simpleName!!)) {
+                if (!isTableExist(it.value.tableName)) {
                     //创表
-                    OrmFunCreate.createTableByClass(connection, it)
+                    OrmFunCreate.createTableByClassName(connection, it.key)
                 }
             }
         }
@@ -74,7 +74,7 @@ class KxDb {
          */
         fun <T : Any> getQueryList(kclass: KClass<T>): List<T> {
             //判断是否类已被注册
-            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+            if (kxDbConnConfig.isClassRegister(kclass)) {
                 return OrmFunQuery.queryListByClass(connection, kclass)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
@@ -92,7 +92,7 @@ class KxDb {
          */
         fun <T : Any> getQueryListByCondition(kclass: KClass<T>, lambda: () -> ConditionWhere<out Any>): List<T> {
             val condition = lambda.invoke()
-            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+            if (kxDbConnConfig.isClassRegister(kclass)) {
                 return OrmFunQuery.queryListByCondition(connection, kclass, condition.toSql())
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
@@ -109,7 +109,7 @@ class KxDb {
          * @return
          */
         fun <T : Any> getQueryListByCondition(kclass: KClass<T>, condition: String): List<T> {
-            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+            if (kxDbConnConfig.isClassRegister(kclass)) {
                 return OrmFunQuery.queryListByCondition(connection, kclass, condition)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
@@ -143,7 +143,7 @@ class KxDb {
          */
         fun <T : Any> delete(kclass: KClass<T>, lambda: () -> ConditionWhere<out Any>): Int {
             val condition = lambda.invoke()
-            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+            if (kxDbConnConfig.isClassRegister(kclass)) {
                 return OrmFunDelete.delete(connection, kclass, condition.toSql())
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
@@ -159,7 +159,7 @@ class KxDb {
          * @return
          */
         fun <T : Any> delete(kclass: KClass<T>, condition: String): Int {
-            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+            if (kxDbConnConfig.isClassRegister(kclass)) {
                 return OrmFunDelete.delete(connection, kclass, condition)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
@@ -198,7 +198,7 @@ class KxDb {
             val condition = lambda.invoke()
             val kclass = bean::class
 
-            if (kxDbConnConfig.registerClassList.contains(kclass)) {
+            if (kxDbConnConfig.isClassRegister(kclass)) {
                 return OrmFunUpdate.updateForce(connection, bean, condition)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
