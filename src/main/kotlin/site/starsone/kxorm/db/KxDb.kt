@@ -135,24 +135,6 @@ class KxDb {
 
         /**
          * 删除实体类
-         *
-         * @param T
-         * @param kclass
-         * @param lambda
-         * @receiver
-         * @return
-         */
-        fun <T : Any> delete(kclass: KClass<T>, lambda: () -> ConditionWhere<out Any>): Int {
-            val condition = lambda.invoke()
-            if (kxDbConnConfig.isClassRegister(kclass)) {
-                return OrmFunDelete.delete(connection, kclass, condition.toSql())
-            } else {
-                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
-            }
-        }
-
-        /**
-         * 删除实体类
          * @param T
          * @param kclass
          * @param lambda
