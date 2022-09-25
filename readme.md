@@ -55,7 +55,10 @@ implementation 'com.github.stars-one:kxorm:Tag'
 > 注意:**参数需要使用`var`关键字**,因为用查询是用反射初始化的,定义为val会导致实例初始化失败!!
 
 ```kotlin
+@Table("my_data")
 data class ItemData(
+    @TableColumnPk
+    @TableColumn("data_id")
     var dataId:String,
     var file: File,
     var dirName: String,
@@ -138,9 +141,7 @@ val data = ItemData(dataId,File("D:\\temp"),"mydirName11",20)
 KxDb.insert(data)
 
 data.myCount = 45
-val row = KxDb.updateForce(data){
-    ItemData::dataId eq dataId
-}
+val row = KxDb.updateForce(data)
 ```
 
 ### 6.删除
@@ -148,7 +149,5 @@ val row = KxDb.updateForce(data){
 ```kotlin
 val data = ItemData("232",File("D:\\temp"),"mydirName11",20)
 KxDb.insert(data)
-val row = KxDb.delete(ItemData::class){
-    ItemData::dataId eq "232"
-}
+val row = KxDb.delete(data)
 ```
