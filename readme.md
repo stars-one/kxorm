@@ -65,6 +65,7 @@ data class ItemData(
     var myCount:Int
 )
 ```
+> **注意一定要使用`var`关键字声明属性值,否则会出现问题!!**
 
 目前测试是支持String,Int和File类型(其实File类型入库也是String类型)
 
