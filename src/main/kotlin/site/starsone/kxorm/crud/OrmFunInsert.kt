@@ -15,6 +15,14 @@ import kotlin.reflect.full.withNullability
  *
  */
 object OrmFunInsert {
+    /**
+     * 插入单条数据
+     *
+     * @param T
+     * @param conn
+     * @param data
+     * @return
+     */
     fun <T : Any> insert(conn: Connection, data: T): Int {
         val sql = generateInsertSql(data)
         if (sql.isNotBlank()) {
@@ -26,6 +34,14 @@ object OrmFunInsert {
         return 0
     }
 
+    /**
+     * 批量插入多条数据
+     *
+     * @param T
+     * @param conn
+     * @param data
+     * @return
+     */
     fun <T : Any> insert(conn: Connection, data: List<T>): Int {
         val statement = conn.createStatement()
         data.forEach {
@@ -39,6 +55,13 @@ object OrmFunInsert {
         return arr.sum()
     }
 
+    /**
+     * 将实体类转为对应的insert语句
+     *
+     * @param T
+     * @param data
+     * @return
+     */
     private fun <T : Any> generateInsertSql(data: T): String {
         //类转为具体对应创表sql
         val kclass = data::class
