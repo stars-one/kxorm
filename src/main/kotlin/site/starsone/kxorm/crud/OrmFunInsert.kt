@@ -16,9 +16,32 @@ import kotlin.reflect.full.withNullability
  */
 object OrmFunInsert {
     fun <T : Any> insert(conn: Connection, data: T): Int {
+        val sql = generateInsertSql(data)
+        if (sql.isNotBlank()) {
+            val statement = conn.createStatement()
+            val rows = statement.executeUpdate(sql)
+            statement.close()
+            return rows
+        }
+        return 0
+    }
+
+    fun <T : Any> insert(conn: Connection, data: List<T>): Int {
+        val statement = conn.createStatement()
+        data.forEach {
+            val sql = generateInsertSql(it)
+            if (sql.isNotBlank()) {
+                statement.addBatch(sql)
+            }
+        }
+        val arr = statement.executeBatch()
+        statement.close()
+        return arr.sum()
+    }
+
+    private fun <T : Any> generateInsertSql(data: T): String {
         //类转为具体对应创表sql
         val kclass = data::class
-
 
         val tableInfo = KxDb.kxDbConnConfig.getTableInfoByClass(kclass)
         if (tableInfo != null) {
@@ -29,9 +52,9 @@ object OrmFunInsert {
             val valueList = arrayListOf<Any>()
 
             kclass.declaredMemberProperties.forEach {
-               //通过实体字段名找到对应的列信息
-                val columnInfo = columns.firstOrNull {column->
-                    column.fieldName ==  it.name
+                //通过实体字段名找到对应的列信息
+                val columnInfo = columns.firstOrNull { column ->
+                    column.fieldName == it.name
                 }
                 //数据库的参数名使用列信息里的columnName字段
                 paramList.add(columnInfo!!.columnName)
@@ -53,20 +76,10 @@ object OrmFunInsert {
             val sql = """
                 INSERT INTO ${tableName} ( ${paramStr}) VALUES(${valueStr})
             """.trimIndent()
-
-            println("执行插入sql: $sql")
-            val statement = conn.createStatement()
-            val rows = statement.executeUpdate(sql)
-            statement.close()
-
-            return rows
+            return sql
         } else {
             println("tableInfo为空!!")
         }
-        return 0
-    }
-
-    fun <T : Any> insert(conn: Connection, data: List<T>): Int {
-        TODO("批量插入数据")
+        return ""
     }
 }

@@ -55,6 +55,17 @@ class KxDb {
         }
 
         /**
+         * 插入数据
+         *
+         * @param T
+         * @param data
+         * @return
+         */
+        fun <T : Any> insert(data: List<T>): Int {
+            return OrmFunInsert.insert(connection, data)
+        }
+
+        /**
          * 更新数据
          *
          * @param data 数据
