@@ -74,6 +74,35 @@ class KxOrmTest {
         assert(result>0)
     }
 
+    /***
+     * 测试批量更新方法
+     */
+    @Test
+    fun testCreateAndBatchUpdate() {
+        val list = arrayListOf<ItemData>()
+        repeat(5) {
+            val data = ItemData(
+                "8122-$it",
+                File("D:\\temp\\myd.png"),
+                "D:\\temp",
+                12
+            )
+            list.add(data)
+        }
+        //插入操作
+        val result = KxDb.insert(list)
+        println("批量插入数据:$result")
+
+        //更新操作
+        list.forEachIndexed { index, itemData ->
+            itemData.myCount = index+50
+        }
+
+       val result2= KxDb.updateForce(list)
+
+        assert(result==result2)
+    }
+
     /**
      * 查询所有数据
      */
