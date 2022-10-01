@@ -42,7 +42,6 @@ class KxOrmTest {
      */
     @Test
     fun testCreateAndInsert() {
-        initDb()
         val data = ItemData(
             "122",
             File("D:\\temp\\myd.png"),
@@ -54,11 +53,32 @@ class KxOrmTest {
     }
 
     /**
+     * 测试插入数据
+     *
+     */
+    @Test
+    fun testCreateAndBatchInsert() {
+        val list = arrayListOf<ItemData>()
+        repeat(5) {
+            val data = ItemData(
+                "122-$it",
+                File("D:\\temp\\myd.png"),
+                "D:\\temp",
+                12
+            )
+            list.add(data)
+        }
+
+        val result = KxDb.insert(list)
+        println("批量插入数据:$result")
+        assert(result>0)
+    }
+
+    /**
      * 查询所有数据
      */
     @Test
     fun queryAllList() {
-        initDb()
         //查询
         val queryList = KxDb.getQueryList(kclass)
         println(queryList.toString())
