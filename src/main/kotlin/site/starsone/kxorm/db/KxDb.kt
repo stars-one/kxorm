@@ -50,8 +50,13 @@ class KxDb {
          * @param data
          * @return
          */
-        fun <T : Any> insert(data: T): Int {
-            return OrmFunInsert.insert(connection, data)
+        inline fun <reified T : Any> insert(data: T): Int {
+            val kclass = T::class
+            if (kxDbConnConfig.isClassRegister(kclass)) {
+                return OrmFunInsert.insert(connection, data)
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
         }
 
         /**
@@ -61,8 +66,13 @@ class KxDb {
          * @param data
          * @return
          */
-        fun <T : Any> insert(data: List<T>): Int {
-            return OrmFunInsert.insert(connection, data)
+        inline fun <reified T : Any> insert(data: List<T>): Int {
+            val kclass = T::class
+            if (kxDbConnConfig.isClassRegister(kclass)) {
+                return OrmFunInsert.insert(connection, data)
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
         }
 
         /**
@@ -74,6 +84,39 @@ class KxDb {
         fun <T : Any> update(data: T): Int {
             TODO("Orm更新数据实现")
         }
+
+        /**
+         * 更新实体类
+         *
+         * @param T
+         * @param bean
+         * @return
+         */
+        inline fun <reified T : Any> updateForce(bean: T): Int {
+            val kclass = T::class
+            if (kxDbConnConfig.isClassRegister(kclass)) {
+                return OrmFunUpdate.updateForce(connection, bean)
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+        }
+
+        /**
+         * 更新实体类
+         *
+         * @param T
+         * @param beanList
+         * @return
+         */
+        inline fun <reified T : Any> updateForce(beanList: List<T>): Int {
+            val kclass = T::class
+            if (kxDbConnConfig.isClassRegister(kclass)) {
+                return OrmFunUpdate.updateForce(connection, beanList)
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+        }
+
 
         /**
          * 获取查询后的实体列表数据
@@ -181,22 +224,6 @@ class KxDb {
             val kclass = bean::class
             if (kxDbConnConfig.isClassRegister(bean::class)) {
                 return OrmFunDelete.delete(connection,bean)
-            } else {
-                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
-            }
-        }
-
-        /**
-         * 更新实体类
-         *
-         * @param T
-         * @param bean
-         * @return
-         */
-        fun <T : Any> updateForce(bean: T): Int {
-            val kclass = bean::class
-            if (kxDbConnConfig.isClassRegister(kclass)) {
-                return OrmFunUpdate.updateForce(connection, bean)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
             }

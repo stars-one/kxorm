@@ -16,6 +16,31 @@ import kotlin.reflect.full.withNullability
  */
 object OrmFunUpdate {
     /**
+     * 批量更新数据(新数据强制覆盖旧数据)
+     *
+     * @param T
+     * @param conn 数据库连接
+     * @param data 数据列表
+     * @param condition where条件(不包含where关键字)
+     * @return
+     */
+    fun <T : Any> updateForce(conn: Connection, data: List<T>): Int {
+        if (data.isNotEmpty()) {
+            val statement = conn.createStatement()
+            data.forEach {
+                val sql = generateUpdateSql(it)
+                if (sql.isNotBlank()) {
+                    statement.addBatch(sql)
+                }
+            }
+            val arr = statement.executeBatch()
+            return arr.sum()
+        }
+        return 0
+
+    }
+
+    /**
      * 更新数据(新数据强制覆盖旧数据)
      *
      * @param T
@@ -25,6 +50,18 @@ object OrmFunUpdate {
      * @return
      */
     fun <T : Any> updateForce(conn: Connection, data: T): Int {
+        val generateUpdateSql = generateUpdateSql(data)
+        if (generateUpdateSql.isNotBlank()) {
+            println("更新sql: $generateUpdateSql")
+            val statement = conn.createStatement()
+            val rows = statement.executeUpdate(generateUpdateSql)
+            statement.close()
+            return rows
+        }
+        return 0
+    }
+
+    private fun <T : Any> generateUpdateSql(data: T): String {
         //类转为具体对应创表sql
         val kclass = data::class
 
@@ -59,9 +96,11 @@ object OrmFunUpdate {
             }
 
             val sb = StringBuilder("update $tableName set ")
-            var whereSql = ""
 
+            var whereSql = ""
             val setSqlList = arrayListOf<String>()
+
+            //排查主键,主键只作为条件,不允许修改
             paramList.forEachIndexed { index, param ->
                 pkColumnInfo?.let {
                     val value = valueList[index]
@@ -74,19 +113,16 @@ object OrmFunUpdate {
                 }
             }
 
+            //设置对应的set字段几数值
             sb.append(setSqlList.joinToString())
             sb.append(" where $whereSql")
             val sql = sb.toString()
             println("更新sql: $sql")
-            val statement = conn.createStatement()
-            val rows = statement.executeUpdate(sql)
-            statement.close()
-            return rows
+            return sql
         } else {
             println("tableInfo为空!!")
         }
-
-        return 0
+        return ""
     }
 
 }
