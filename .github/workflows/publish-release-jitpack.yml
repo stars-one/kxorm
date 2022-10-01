@@ -11,7 +11,8 @@ on:
 jobs:
   create-release:
     runs-on: ubuntu-latest
-
+    permissions: write-all
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -23,8 +24,8 @@ jobs:
         with:
           # GitHub secret token
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ github.ref }}"
+          automatic_release_tag: "${{ github.event.release.tag_name }}"
           prerelease: false
-          title: "${{ github.ref }}"
+          title: "${{ github.event.release.tag_name }}"
              
    
