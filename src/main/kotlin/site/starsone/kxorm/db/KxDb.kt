@@ -223,7 +223,22 @@ class KxDb {
         fun <T : Any> delete(bean: T): Int {
             val kclass = bean::class
             if (kxDbConnConfig.isClassRegister(bean::class)) {
-                return OrmFunDelete.delete(connection,bean)
+                return OrmFunDelete.delete(connection, bean)
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+        }
+
+        /**
+         * 删除某个实体类
+         * @param T
+         * @param list
+         * @return
+         */
+        fun <T : Any> delete(list: List<T>): Int {
+            val kclass = list::class
+            if (kxDbConnConfig.isClassRegister(list::class)) {
+                return OrmFunDelete.delete(connection, list)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
             }
