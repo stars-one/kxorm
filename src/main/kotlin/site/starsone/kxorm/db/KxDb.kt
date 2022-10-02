@@ -235,9 +235,9 @@ class KxDb {
          * @param list
          * @return
          */
-        fun <T : Any> delete(list: List<T>): Int {
-            val kclass = list::class
-            if (kxDbConnConfig.isClassRegister(list::class)) {
+        inline fun <reified T : Any> delete(list: List<T>): Int {
+            val kclass = T::class
+            if (kxDbConnConfig.isClassRegister(kclass)) {
                 return OrmFunDelete.delete(connection, list)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
