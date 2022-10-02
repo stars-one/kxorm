@@ -42,6 +42,7 @@ class KxOrmTest {
      */
     @Test
     fun testCreateAndInsert() {
+        initDb()
         val data = ItemData(
             "122",
             File("D:\\temp\\myd.png"),
@@ -58,6 +59,7 @@ class KxOrmTest {
      */
     @Test
     fun testCreateAndBatchInsert() {
+        initDb()
         val list = arrayListOf<ItemData>()
         repeat(5) {
             val data = ItemData(
@@ -79,6 +81,7 @@ class KxOrmTest {
      */
     @Test
     fun testCreateAndBatchUpdate() {
+        initDb()
         val list = arrayListOf<ItemData>()
         repeat(5) {
             val data = ItemData(
@@ -108,6 +111,7 @@ class KxOrmTest {
      */
     @Test
     fun queryAllList() {
+        initDb()
         //查询
         val queryList = KxDb.getQueryList(kclass)
         println(queryList.toString())
@@ -120,6 +124,7 @@ class KxOrmTest {
      */
     @Test
     fun queryListByCondition() {
+        initDb()
         val list = KxDb.getQueryListByCondition(ItemData::class, "MYCOUNT > 10")
 //        val list = KxDb.getQueryListByCondition(ItemData::class){
 //            ItemData::myCount gt 10
@@ -134,6 +139,7 @@ class KxOrmTest {
      */
     @Test
     fun delete() {
+        initDb()
         val data = ItemData("28832", File("D:\\temp"), "mydirName11", 20)
         KxDb.insert(data)
         val row = KxDb.delete(data)
@@ -160,11 +166,10 @@ class KxOrmTest {
 
     @Test
     fun update() {
-
+        initDb()
         val dataId = UUID.randomUUID().toString()
         val data = ItemData(dataId, File("D:\\temp"), "mydirName11", 20)
         KxDb.insert(data)
-
         data.myCount = 45
         val row = KxDb.updateForce(data)
         assert(row == 1)
