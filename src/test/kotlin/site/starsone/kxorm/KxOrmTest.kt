@@ -49,7 +49,7 @@ class KxOrmTest {
             12
         )
         val result = KxDb.insert(data)
-        assert(result==1)
+        assert(result == 1)
     }
 
     /**
@@ -71,7 +71,7 @@ class KxOrmTest {
 
         val result = KxDb.insert(list)
         println("批量插入数据:$result")
-        assert(result>0)
+        assert(result > 0)
     }
 
     /***
@@ -95,12 +95,12 @@ class KxOrmTest {
 
         //更新操作
         list.forEachIndexed { index, itemData ->
-            itemData.myCount = index+50
+            itemData.myCount = index + 50
         }
 
-       val result2= KxDb.updateForce(list)
+        val result2 = KxDb.updateForce(list)
 
-        assert(result==result2)
+        assert(result == result2)
     }
 
     /**
@@ -120,7 +120,7 @@ class KxOrmTest {
      */
     @Test
     fun queryListByCondition() {
-        val list = KxDb.getQueryListByCondition(ItemData::class,"MYCOUNT > 10")
+        val list = KxDb.getQueryListByCondition(ItemData::class, "MYCOUNT > 10")
 //        val list = KxDb.getQueryListByCondition(ItemData::class){
 //            ItemData::myCount gt 10
 //        }
@@ -134,22 +134,40 @@ class KxOrmTest {
      */
     @Test
     fun delete() {
-        val data = ItemData("28832",File("D:\\temp"),"mydirName11",20)
+        val data = ItemData("28832", File("D:\\temp"), "mydirName11", 20)
         KxDb.insert(data)
         val row = KxDb.delete(data)
-        assert(row==1)
+        assert(row == 1)
+    }
+
+    /**
+     * 根据条件查询列表
+     *
+     */
+    @Test
+    fun deleteList() {
+        initDb()
+        val list = arrayListOf<ItemData>()
+        repeat(5) {
+            val data = ItemData("28832-$it", File("D:\\temp"), "mydirName11", 20)
+            list.add(data)
+        }
+        KxDb.insert(list)
+        val row = KxDb.delete(list)
+        println("删除行数:$row")
+        assert(row == list.size)
     }
 
     @Test
     fun update() {
 
         val dataId = UUID.randomUUID().toString()
-        val data = ItemData(dataId,File("D:\\temp"),"mydirName11",20)
+        val data = ItemData(dataId, File("D:\\temp"), "mydirName11", 20)
         KxDb.insert(data)
 
         data.myCount = 45
         val row = KxDb.updateForce(data)
-        assert(row==1)
+        assert(row == 1)
     }
 
 
