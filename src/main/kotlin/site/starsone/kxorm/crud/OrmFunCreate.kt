@@ -23,7 +23,12 @@ object OrmFunCreate {
         val tableName = tableInfo.tableName
         val paramList = arrayListOf<Pair<String, String>>()
         tableInfo.columns.forEach {
-            val pair = Pair(it.columnName, it.columnType)
+            val columnType = if (it.isPk) {
+                "${it.columnType} primary key"
+            }else{
+                it.columnType
+            }
+            val pair = Pair(it.columnName, columnType)
             paramList.add(pair)
         }
 
