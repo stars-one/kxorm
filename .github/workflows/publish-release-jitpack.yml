@@ -22,6 +22,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           exclude_types: doc,chore
+          config_file: .github/workflows/changelog-config.js
 
       - name: Create release
         uses: actions/create-release@latest
@@ -32,7 +33,4 @@ jobs:
           release_name: Release ${{ github.ref }}
           body: ${{ steps.changelog.outputs.changes }}
 
-      - name: publish jitpack
-        uses: badasintended/autojitpack@v1
-        with:
-          version: ${{ github.event.release.tag_name }}
+
