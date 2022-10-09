@@ -70,7 +70,6 @@ class ParseToTableInfoTest {
             val fieldName = field.name
             val columnInfo = tableInfo.getColumnByFieldName(fieldName)
 
-            //todo 这里考虑加上字段名验证(不允许和数据库中的关键字同名)
 
             val declaredAnnotations = field.declaredAnnotations
             if (declaredAnnotations.isEmpty()) {
@@ -80,7 +79,6 @@ class ParseToTableInfoTest {
             }
 
             declaredAnnotations.forEach {
-                //todo 考虑转属性名转为下划线等
                 //如果存在有TableColumn注解,则使用注解上的属性作为数据库字段名,否则就设置与实体类的成员变量名一致
                 if (it.annotationClass == TableColumn::class) {
                     val tableColumn = it as TableColumn
