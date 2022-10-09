@@ -98,6 +98,12 @@ class KxDbConnConfig(val url: String, val user: String, val pwd: String) {
 
             //todo 这里考虑加上字段名验证(不允许和数据库中的关键字同名)
 
+            val keywords ="desc,asc"
+            if (keywords.split(",").contains(fieldName)) {
+                error("实体类字段名是数据库关键字,请调整后实体类后重新尝试")
+                return@forEach
+            }
+
             //先设置默认的数据库字段名与数据实体字段名一致,后续判断是否有对应的TableColumn注解从而进行更改
             columnInfo?.columnName = columnInfo?.fieldName!!
 
