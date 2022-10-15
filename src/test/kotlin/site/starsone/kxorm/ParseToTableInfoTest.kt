@@ -49,8 +49,7 @@ class ParseToTableInfoTest {
             //根据实体数据类型转为数据库数据类型
             columnInfo.fieldType = kParameter.type
             columnInfo.fieldName = kParameter.name!!
-
-            //todo 可以考虑用属性委托来整
+            
             if (columnInfo.fieldType == String::class.starProjectedType || columnInfo.fieldType == File::class.starProjectedType) {
                 columnInfo.columnType = "varchar(500)"
             }
