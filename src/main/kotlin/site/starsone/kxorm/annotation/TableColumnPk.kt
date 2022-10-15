@@ -8,4 +8,14 @@ package site.starsone.kxorm.annotation
  *
  */
 @Target(AnnotationTarget.FIELD)
-annotation class TableColumnPk()
+annotation class TableColumnPk(val type: PkType=PkType.NONE)
+
+/**
+ * Pk type
+ * - NONE 用户自行设置
+ * - ASSIGN_UUID 插入前生成UUID
+ * - ASSIGN_ID 插入前生成雪花ID
+ */
+enum class PkType {
+    NONE, ASSIGN_UUID, ASSIGN_ID
+}

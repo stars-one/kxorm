@@ -1,5 +1,6 @@
 package site.starsone.kxorm.bean
 
+import site.starsone.kxorm.annotation.PkType
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
@@ -51,6 +52,11 @@ class TableColumnInfo {
      * 是否主键
      */
     var isPk = false
+
+    /**
+     * 主键ID生成方式
+     */
+    var pkType: PkType = PkType.NONE
 
     /**
      * 数据库字段名

@@ -1,9 +1,12 @@
 package site.starsone.kxorm.db
 
+import com.github.yitter.contract.IdGeneratorOptions
+import com.github.yitter.idgen.YitIdHelper
 import site.starsone.kxorm.condition.ConditionWhere
 import site.starsone.kxorm.crud.*
 import java.sql.Connection
 import kotlin.reflect.KClass
+
 
 /**
  *
@@ -24,6 +27,11 @@ class KxDb {
          * @param kxDbConnConfig
          */
         fun init(kxDbConnConfig: KxDbConnConfig) {
+            // 雪花算法,全局初始化一次
+            // 创建 IdGeneratorOptions 对象，可在构造函数中输入 WorkerId：
+            val options = IdGeneratorOptions(6)
+            YitIdHelper.setIdGenerator(options)
+
             this.kxDbConnConfig = kxDbConnConfig
             //数据库连接
             connection = kxDbConnConfig.connect()

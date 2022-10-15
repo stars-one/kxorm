@@ -112,14 +112,16 @@ class KxDbConnConfig(val url: String, val user: String, val pwd: String) {
             declaredAnnotations.forEach {
                 //todo 考虑转属性名转为下划线等
                 //如果存在有TableColumn注解,则使用注解上的属性作为数据库字段名,否则就设置与实体类的成员变量名一致
-                if (it.annotationClass == TableColumn::class) {
-                    val tableColumn = it as TableColumn
-                    columnInfo?.columnName = tableColumn.columnName
+                if (it is TableColumn) {
+                    columnInfo.columnName = it.columnName
                 }
 
                 //判断是否含TableColumnPk注解(即为主键)
-                if (it.annotationClass == TableColumnPk::class) {
-                    columnInfo?.isPk = true
+                if (it is TableColumnPk) {
+                    columnInfo.isPk = true
+                    val pkType =it.type
+                    //设置主键id生成方式
+                    columnInfo.pkType = pkType
                 }
             }
         }

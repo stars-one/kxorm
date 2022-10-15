@@ -1,8 +1,11 @@
 package site.starsone.kxorm.crud
 
+import com.github.yitter.idgen.YitIdHelper
+import site.starsone.kxorm.annotation.PkType
 import site.starsone.kxorm.db.KxDb
 import java.io.File
 import java.sql.Connection
+import java.util.*
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.starProjectedType
 import kotlin.reflect.full.withNullability
@@ -75,22 +78,47 @@ object OrmFunInsert {
             val valueList = arrayListOf<Any>()
 
             kclass.declaredMemberProperties.forEach {
+
                 //通过实体字段名找到对应的列信息
-                val columnInfo = columns.firstOrNull { column ->
+                val columnInfo = columns.first { column ->
                     column.fieldName == it.name
                 }
                 //数据库的参数名使用列信息里的columnName字段
-                paramList.add(columnInfo!!.columnName)
+                paramList.add(columnInfo.columnName)
 
-                //获取实体数据类对象的数值
-                if (it.returnType.withNullability(false) == String::class.starProjectedType || it.returnType.withNullability(
-                        false
-                    ) == File::class.starProjectedType
-                ) {
-                    //string类型和file类型需要特殊处理
-                    valueList.add("""'${it.getter.call(data).toString()}'""")
+                //如果当前列是主键
+                if (columnInfo.isPk) {
+                    val idResult = when (columnInfo.pkType) {
+                        PkType.ASSIGN_ID -> YitIdHelper.nextId().toString()
+                        PkType.ASSIGN_UUID -> UUID.randomUUID().toString()
+                        PkType.NONE -> ""
+                    }
+
+                    if (idResult.isNotBlank()) {
+                        valueList.add("""'$idResult'""")
+                    } else {
+                        //获取实体数据类对象的数值
+                        if (it.returnType.withNullability(false) == String::class.starProjectedType || it.returnType.withNullability(
+                                false
+                            ) == File::class.starProjectedType
+                        ) {
+                            //string类型和file类型需要特殊处理
+                            valueList.add("""'${it.getter.call(data).toString()}'""")
+                        } else {
+                            valueList.add(it.getter.call(data).toString())
+                        }
+                    }
                 } else {
-                    valueList.add(it.getter.call(data).toString())
+                    //获取实体数据类对象的数值
+                    if (it.returnType.withNullability(false) == String::class.starProjectedType || it.returnType.withNullability(
+                            false
+                        ) == File::class.starProjectedType
+                    ) {
+                        //string类型和file类型需要特殊处理
+                        valueList.add("""'${it.getter.call(data).toString()}'""")
+                    } else {
+                        valueList.add(it.getter.call(data).toString())
+                    }
                 }
             }
             val paramStr = paramList.joinToString()
