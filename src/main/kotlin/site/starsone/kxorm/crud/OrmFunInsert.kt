@@ -3,12 +3,13 @@ package site.starsone.kxorm.crud
 import com.github.yitter.idgen.YitIdHelper
 import site.starsone.kxorm.annotation.PkType
 import site.starsone.kxorm.db.KxDb
+import site.starsone.kxorm.isSameClass
+import site.starsone.kxorm.toFormatString
 import java.io.File
 import java.sql.Connection
+import java.time.chrono.ChronoLocalDateTime
 import java.util.*
 import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.starProjectedType
-import kotlin.reflect.full.withNullability
 
 /**
  * 插入的相关方法工具类
@@ -87,6 +88,32 @@ object OrmFunInsert {
                 paramList.add(columnInfo.columnName)
 
                 //如果当前列是主键
+                //todo 插入语句兼容其他类型
+
+                //获取实体数据类对象的数值
+                val columnReturnType = it.returnType
+                var value = when {
+                    //string类型和file类型需要特殊处理
+                    columnReturnType.isSameClass(String::class) -> {
+                        """'${it.getter.call(data).toString()}'"""
+                    }
+                    columnReturnType.isSameClass(File::class) -> {
+                        """'${it.getter.call(data).toString()}'"""
+                    }
+                    //日期类型
+                    columnReturnType.isSameClass(ChronoLocalDateTime::class) -> {
+                        val dataResult = it.getter.call(data)
+                        """'${it.getter.call(data).toString()}'"""
+                    }
+                    columnReturnType.isSameClass(Date::class) -> {
+                        val result =  it.getter.call(data) as Date
+                        """'${result.toFormatString()}'"""
+                    }
+
+                    else -> it.getter.call(data).toString()
+                }
+
+                //如果是主键,则使用自动生成ID
                 if (columnInfo.isPk) {
                     val idResult = when (columnInfo.pkType) {
                         PkType.ASSIGN_ID -> YitIdHelper.nextId().toString()
@@ -94,33 +121,15 @@ object OrmFunInsert {
                         PkType.NONE -> ""
                     }
 
+                    //选用了对应的ID生成方式,才会修改数值
                     if (idResult.isNotBlank()) {
-                        valueList.add("""'$idResult'""")
-                    } else {
-                        //获取实体数据类对象的数值
-                        if (it.returnType.withNullability(false) == String::class.starProjectedType || it.returnType.withNullability(
-                                false
-                            ) == File::class.starProjectedType
-                        ) {
-                            //string类型和file类型需要特殊处理
-                            valueList.add("""'${it.getter.call(data).toString()}'""")
-                        } else {
-                            valueList.add(it.getter.call(data).toString())
-                        }
-                    }
-                } else {
-                    //获取实体数据类对象的数值
-                    if (it.returnType.withNullability(false) == String::class.starProjectedType || it.returnType.withNullability(
-                            false
-                        ) == File::class.starProjectedType
-                    ) {
-                        //string类型和file类型需要特殊处理
-                        valueList.add("""'${it.getter.call(data).toString()}'""")
-                    } else {
-                        valueList.add(it.getter.call(data).toString())
+                       value = idResult
                     }
                 }
+
+                valueList.add(value)
             }
+
             val paramStr = paramList.joinToString()
             val valueStr = valueList.joinToString()
 
@@ -134,3 +143,5 @@ object OrmFunInsert {
         return ""
     }
 }
+
+

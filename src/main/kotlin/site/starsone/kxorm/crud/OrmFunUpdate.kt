@@ -1,11 +1,13 @@
 package site.starsone.kxorm.crud
 
 import site.starsone.kxorm.db.KxDb
+import site.starsone.kxorm.isSameClass
+import site.starsone.kxorm.toFormatString
 import java.io.File
 import java.sql.Connection
+import java.time.chrono.ChronoLocalDateTime
+import java.util.*
 import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.starProjectedType
-import kotlin.reflect.full.withNullability
 
 /**
  * 更新的相关方法工具类
@@ -84,15 +86,28 @@ object OrmFunUpdate {
                 paramList.add(columnInfo!!.columnName)
 
                 //获取实体数据类对象的数值
-                if (it.returnType.withNullability(false) == String::class.starProjectedType || it.returnType.withNullability(
-                        false
-                    ) == File::class.starProjectedType
-                ) {
+                val columnReturnType = it.returnType
+                val value = when {
                     //string类型和file类型需要特殊处理
-                    valueList.add("""'${it.getter.call(data).toString()}'""")
-                } else {
-                    valueList.add(it.getter.call(data).toString())
+                    columnReturnType.isSameClass(String::class) -> {
+                        """'${it.getter.call(data).toString()}'"""
+                    }
+                    columnReturnType.isSameClass(File::class) -> {
+                        """'${it.getter.call(data).toString()}'"""
+                    }
+                    //日期类型
+                    columnReturnType.isSameClass(ChronoLocalDateTime::class) -> {
+                        val dataResult = it.getter.call(data)
+                        """'${it.getter.call(data).toString()}'"""
+                    }
+                    columnReturnType.isSameClass(Date::class) -> {
+                        val result =  it.getter.call(data) as Date
+                        """'${result.toFormatString()}'"""
+                    }
+
+                    else -> it.getter.call(data).toString()
                 }
+                valueList.add(value)
             }
 
             val sb = StringBuilder("update $tableName set ")

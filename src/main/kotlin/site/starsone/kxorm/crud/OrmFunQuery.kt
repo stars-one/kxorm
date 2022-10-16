@@ -5,6 +5,7 @@ import site.starsone.kxorm.db.KxDb
 import site.starsone.kxorm.toFileNameType
 import java.io.File
 import java.sql.Connection
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KMutableProperty
@@ -34,7 +35,7 @@ object OrmFunQuery {
         kclass.primaryConstructor?.parameters?.forEach {
             val tableInfo = KxDb.kxDbConnConfig.getTableInfoByClass(kclass)
             //取数据库实体信息保存的columnName,因为可能会出现实体类字段与数据库字段不同的情况
-            val keyName = tableInfo?.getColumnByFieldName(it.name!!)?.columnName?:""
+            val keyName = tableInfo?.getColumnByFieldName(it.name!!)?.columnName ?: ""
             map[keyName] =
                 Pair(
                     it.type,
@@ -47,6 +48,9 @@ object OrmFunQuery {
             }
             if (it.type == File::class.starProjectedType) {
                 defaultValueList.add(File(""))
+            }
+            if (it.type == Date::class.starProjectedType) {
+                defaultValueList.add(Date())
             }
         }
 
@@ -70,7 +74,10 @@ object OrmFunQuery {
                 }
                 if (type == Int::class.starProjectedType) {
                     val result = getFieldValue(resultSet, t.toFileNameType(Int::class))
-                    println(result)
+                    kMutableProperty.setter.call(dataClassObject, result)
+                }
+                if (type == Date::class.starProjectedType) {
+                    val result = getFieldValue(resultSet, t.toFileNameType(Date::class))
                     kMutableProperty.setter.call(dataClassObject, result)
                 }
             }
@@ -89,6 +96,7 @@ object OrmFunQuery {
      * @return
      */
     private fun <T : Any> getFieldValue(resultSet: JdbcResultSet, fileNameType: Pair<String, KClass<out T>>): T? {
+
         val fieldName = fileNameType.first
         val kclass = fileNameType.second
         val method = getMethod(resultSet::class, kclass)
@@ -108,22 +116,19 @@ object OrmFunQuery {
         val methodName = when {
             kClass == String::class -> "getString"
             kClass == Int::class -> "getInt"
+            kClass == Date::class -> "getDate"
             else -> ""
         }
-        return resultSetKclass.declaredMemberFunctions.find {
+        val myFun = resultSetKclass.declaredMemberFunctions.find {
             val isMethodNameTrue = it.name == methodName
-            if (isMethodNameTrue) {
-                //参数
-                val flag = it.parameters.any { param ->
-//                    println("${it.type.withNullability(false)} ${String::class.createType()}")
-                    param.type.withNullability(false) == String::class.createType()
-                }
-                isMethodNameTrue && flag
-            } else {
-                false
+            val paramCount = it.valueParameters.size == 1
+            //参数
+            val rightParamType = it.valueParameters.any { param ->
+                param.type.withNullability(false) == String::class.createType()
             }
+            isMethodNameTrue && rightParamType && paramCount
         } as KFunction<T>?
-
+        return myFun
     }
 
     /**

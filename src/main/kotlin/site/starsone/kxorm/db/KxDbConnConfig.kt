@@ -5,12 +5,15 @@ import site.starsone.kxorm.annotation.TableColumn
 import site.starsone.kxorm.annotation.TableColumnPk
 import site.starsone.kxorm.bean.TableColumnInfo
 import site.starsone.kxorm.bean.TableInfo
+import site.starsone.kxorm.isSameClass
 import java.io.File
 import java.sql.Connection
 import java.sql.DriverManager
+import java.time.chrono.ChronoLocalDateTime
+import java.util.*
+import kotlin.collections.LinkedHashMap
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
-import kotlin.reflect.full.starProjectedType
 
 /**
  * 数据库连接配置类初始化
@@ -77,12 +80,18 @@ class KxDbConnConfig(val url: String, val user: String, val pwd: String) {
             columnInfo.fieldName = kParameter.name!!
 
             //todo 可以考虑用属性委托来整
-            if (columnInfo.fieldType == String::class.starProjectedType || columnInfo.fieldType == File::class.starProjectedType) {
-                columnInfo.columnType = "varchar(500)"
-            }
-
-            if (columnInfo.fieldType == Int::class.starProjectedType) {
-                columnInfo.columnType = "INTEGER"
+            //todo 创表的各数据字段类型转换,兼容更多类型
+            columnInfo.fieldType?.let {
+                val temp = when {
+                    it.isSameClass(String::class) -> "varchar(500)"
+                    it.isSameClass(File::class) -> "varchar(500)"
+                    it.isSameClass(Int::class) -> "INTEGER"
+                    //日期类型
+                    it.isSameClass(ChronoLocalDateTime::class) -> "datetime"
+                    it.isSameClass(Date::class) -> "datetime"
+                    else -> ""
+                }
+                columnInfo.columnType = temp
             }
 
             tableInfo.columns.add(columnInfo)
@@ -98,7 +107,7 @@ class KxDbConnConfig(val url: String, val user: String, val pwd: String) {
 
             //todo 这里考虑加上字段名验证(不允许和数据库中的关键字同名)
 
-            val keywords ="desc,asc"
+            val keywords = "desc,asc"
             if (keywords.split(",").contains(fieldName)) {
                 error("实体类字段名是数据库关键字,请调整后实体类后重新尝试")
                 return@forEach
@@ -119,7 +128,7 @@ class KxDbConnConfig(val url: String, val user: String, val pwd: String) {
                 //判断是否含TableColumnPk注解(即为主键)
                 if (it is TableColumnPk) {
                     columnInfo.isPk = true
-                    val pkType =it.type
+                    val pkType = it.type
                     //设置主键id生成方式
                     columnInfo.pkType = pkType
                 }
