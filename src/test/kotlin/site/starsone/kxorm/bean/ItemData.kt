@@ -3,6 +3,7 @@ package site.starsone.kxorm.bean
 import site.starsone.kxorm.annotation.TableColumn
 import site.starsone.kxorm.annotation.TableColumnPk
 import java.io.File
+import java.util.*
 
 /**
  * 测试数据库实体类(三种类型)
@@ -17,5 +18,6 @@ data class ItemData(
     var dataId:String,
     var file: File,
     var dirName: String,
-    var myCount:Int
+    var myCount:Int,
+    var createTime: Date =Date()
 )
