@@ -67,12 +67,16 @@ data class ItemData(
 ```
 > **注意一定要使用`var`关键字声明属性值,否则会出现问题!!**
 
-目前测试是支持`String`,`Int`和`File`类型(其实`File`类型入库也是`String`类型)
+目前支持字段Java类型:
+- `String`
+- `Int`
+- `File`(`File`类型入库也是`String`类型)
+- `Date`
 
 可用注解:
 - @Table("my_data") 设置数据库表名
 - @TableColumn("data_id") 设置数据库列名
-- @TableColumnPk 设置主键
+- @TableColumnPk(pkType=PkType.Node) 设置主键,同时设置ID自动生成的方法(UUID或雪花ID)
 
 
 ### 2.初始化及数据类注册
