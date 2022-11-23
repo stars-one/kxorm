@@ -2,6 +2,7 @@ package site.starsone.kxorm.crud
 
 import org.h2.jdbc.JdbcResultSet
 import site.starsone.kxorm.db.KxDb
+import site.starsone.kxorm.isSameClass
 import site.starsone.kxorm.toFileNameType
 import java.io.File
 import java.sql.Connection
@@ -36,20 +37,22 @@ object OrmFunQuery {
             val tableInfo = KxDb.kxDbConnConfig.getTableInfoByClass(kclass)
             //取数据库实体信息保存的columnName,因为可能会出现实体类字段与数据库字段不同的情况
             val keyName = tableInfo?.getColumnByFieldName(it.name!!)?.columnName ?: ""
+            val ktype = it.type
+
             map[keyName] =
                 Pair(
                     it.type,
                     kclass.declaredMemberProperties.find { pro -> pro.name == it.name } as KMutableProperty<Any>)
-            if (it.type == String::class.starProjectedType) {
+            if (ktype.isSameClass(String::class)) {
                 defaultValueList.add("")
             }
-            if (it.type == Int::class.starProjectedType) {
+            if (ktype.isSameClass(Int::class)) {
                 defaultValueList.add(0)
             }
-            if (it.type == File::class.starProjectedType) {
+            if (ktype.isSameClass(File::class)) {
                 defaultValueList.add(File(""))
             }
-            if (it.type == Date::class.starProjectedType) {
+            if (ktype.isSameClass(Date::class)) {
                 defaultValueList.add(Date())
             }
         }
