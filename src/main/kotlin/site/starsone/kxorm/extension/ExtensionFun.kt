@@ -31,13 +31,13 @@ fun <T : Any> String.toFileNameType(kclass: KClass<T>): Pair<String, KClass<out 
  * @return
  */
 fun KType.isSameClass(kClass: KClass<out Any>): Boolean {
-    return withNullability(false) == kClass.starProjectedType
+    val starProjectedType = kClass.starProjectedType
+    return this == starProjectedType || this == starProjectedType.withNullability(true)
 }
 
-fun Date.toFormatString(pattern: String="yyyy-MM-dd HH:mm:ss") :String{
+fun Date.toFormatString(pattern: String = "yyyy-MM-dd HH:mm:ss"): String {
     return SimpleDateFormat(pattern).format(this)
 }
-
 
 
 
