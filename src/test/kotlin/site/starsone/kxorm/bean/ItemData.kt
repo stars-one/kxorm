@@ -16,7 +16,7 @@ data class ItemData(
     @TableColumnPk
     @TableColumn("data_id")
     var dataId:String,
-    var file: File,
+    var file: File?=null,
     var dirName: String,
     var myCount:Int,
     var createTime: Date =Date()
