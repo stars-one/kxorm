@@ -67,19 +67,19 @@ object OrmFunQuery {
                 val type = v.first
                 val kMutableProperty = v.second
                 //获取查询后的数据,并赋值给对应
-                if (type == File::class.starProjectedType) {
+                if (type.isSameClass(File::class)) {
                     val result = getFieldValue(resultSet, t.toFileNameType(String::class))
                     kMutableProperty.setter.call(dataClassObject, File(result))
                 }
-                if (type == String::class.starProjectedType) {
+                if (type.isSameClass(String::class)) {
                     val result = getFieldValue(resultSet, t.toFileNameType(String::class))
                     kMutableProperty.setter.call(dataClassObject, result)
                 }
-                if (type == Int::class.starProjectedType) {
+                if (type.isSameClass(Int::class)) {
                     val result = getFieldValue(resultSet, t.toFileNameType(Int::class))
                     kMutableProperty.setter.call(dataClassObject, result)
                 }
-                if (type == Date::class.starProjectedType) {
+                if (type.isSameClass(Date::class)) {
                     val result = getFieldValue(resultSet, t.toFileNameType(Date::class))
                     kMutableProperty.setter.call(dataClassObject, result)
                 }
