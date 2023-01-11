@@ -144,6 +144,11 @@ object OrmFunQuery {
     fun <T : Any> queryListByClass(conn: Connection, kclass: KClass<T>): List<T> {
         val statement = conn.createStatement()
         // 查询数据
+        //todo 分页查询
+        val pageSize=10
+        val pageNum = 1
+        //第一页的10条数据
+        "select * from CNBLOGIMGINFO limit ${pageSize} offset ${(pageNum-1) * pageSize}"
 
         val resultSet = statement.executeQuery("select * from ${kclass.simpleName}") as JdbcResultSet
         val queryList = getQueryList(resultSet, kclass)
