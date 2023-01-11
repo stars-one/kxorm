@@ -119,7 +119,7 @@ object OrmFunQuery {
         val methodName = when {
             kClass == String::class -> "getString"
             kClass == Int::class -> "getInt"
-            kClass == Date::class -> "getDate"
+            kClass == Date::class -> "getTimestamp"
             else -> ""
         }
         val myFun = resultSetKclass.declaredMemberFunctions.find {
