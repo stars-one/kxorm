@@ -2,6 +2,7 @@ package site.starsone.kxorm.db
 
 import com.github.yitter.contract.IdGeneratorOptions
 import com.github.yitter.idgen.YitIdHelper
+import site.starsone.kxorm.condition.ConditionOrderBy
 import site.starsone.kxorm.condition.ConditionWhere
 import site.starsone.kxorm.crud.*
 import java.sql.Connection
@@ -148,14 +149,58 @@ class KxDb {
          *
          * @param T
          * @param kclass 实体类class
-         * @param lambda 传递单条件lambda,如Student.class::name eq "john"
+         * @param whereLambda 传递单条件lambda,如Student.class::name eq "john"
          * @receiver
          * @return
          */
-        fun <T : Any> getQueryListByCondition(kclass: KClass<T>, lambda: () -> ConditionWhere<out Any>): List<T> {
-            val condition = lambda.invoke()
+        fun <T : Any> getQueryListByCondition(kclass: KClass<T>, whereLambda: () -> ConditionWhere<out Any>): List<T> {
+            val condition = whereLambda.invoke()
             if (kxDbConnConfig.isClassRegister(kclass)) {
                 return OrmFunQuery.queryListByCondition(connection, kclass, condition.toSql())
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+        }
+
+        /**
+         * 根据条件,获取数据列表
+         *
+         * @param T
+         * @param kclass 实体类class
+         * @param whereLambda 传递单条件lambda,如{Student.class::name eq "john"}
+         * @param orderLambda 传递单排序lambda,如{ItemData::myCount.orderByAsc()}
+         * @receiver
+         * @return
+         */
+        fun <T : Any> getQueryListByCondition(kclass: KClass<T>, whereLambda: () -> ConditionWhere<out Any>,orderLambda: () -> ConditionOrderBy<out Any>): List<T> {
+            val condition = whereLambda.invoke()
+            val order = orderLambda.invoke()
+            if (kxDbConnConfig.isClassRegister(kclass)) {
+                return OrmFunQuery.queryListByCondition(connection, kclass, condition.toSql(),order.toOrderBySql())
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+        }
+
+
+        /**
+         * 分页查询列表数据
+         *
+         * @param T
+         * @param kclass
+         * @param pageNo 页码(从1开始)
+         * @param pageSize 每页数量
+         * @param whereLambda
+         * @param orderLambda
+         * @receiver
+         * @receiver
+         * @return
+         */
+        fun <T : Any> getQueryListByPage(kclass: KClass<T>,pageNo: Int,pageSize: Int, whereLambda: () -> ConditionWhere<out Any>,orderLambda: () -> ConditionOrderBy<out Any>): List<T> {
+            val condition = whereLambda.invoke()
+            val order = orderLambda.invoke()
+            if (kxDbConnConfig.isClassRegister(kclass)) {
+                return OrmFunQuery.queryListByPage(connection, kclass, condition.toSql(),order.toOrderBySql(),pageNo,pageSize)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
             }
