@@ -144,11 +144,6 @@ object OrmFunQuery {
     fun <T : Any> queryListByClass(conn: Connection, kclass: KClass<T>): List<T> {
         val statement = conn.createStatement()
         // 查询数据
-        //todo 分页查询
-        val pageSize=10
-        val pageNum = 1
-        //第一页的10条数据
-        "select * from CNBLOGIMGINFO limit ${pageSize} offset ${(pageNum-1) * pageSize}"
 
         val resultSet = statement.executeQuery("select * from ${kclass.simpleName}") as JdbcResultSet
         val queryList = getQueryList(resultSet, kclass)
@@ -160,13 +155,69 @@ object OrmFunQuery {
      *
      * @param conn
      * @param kclass
+     * @param condition 不能为空
+     * @param order 排序(不需要order by关键字)
      * @return
      */
-    fun <T : Any> queryListByCondition(conn: Connection, kclass: KClass<T>, condition: String): List<T> {
+    fun <T : Any> queryListByCondition(
+        conn: Connection,
+        kclass: KClass<T>,
+        condition: String,
+        order: String = ""
+    ): List<T> {
         val statement = conn.createStatement()
         // 查询数据
 
-        val sql = "select * from ${kclass.simpleName} where $condition"
+        var trueCondition = ""
+        if (condition.isNotBlank()) {
+            trueCondition = "where $condition"
+        }
+
+        var trueOrder = ""
+        if (order.isNotBlank()) {
+            trueOrder = "order by $order"
+        }
+
+        val sql = "select * from ${kclass.simpleName} $trueCondition $trueOrder"
+        println("查询的sql语句: ${sql}")
+        val resultSet = statement.executeQuery(sql) as JdbcResultSet
+        val queryList = getQueryList(resultSet, kclass)
+        return queryList
+    }
+
+    /**
+     * 查询列表数据(分页)
+     *
+     * @param conn
+     * @param kclass
+     * @param condition 条件
+     * @param pageNo 页码(从1开始)
+     * @param pageSize 每页数量
+     * @param order 排序(不需要order by关键字)
+     * @return
+     */
+    fun <T : Any> queryListByPage(
+        conn: Connection,
+        kclass: KClass<T>,
+        condition: String,
+        order: String,
+        pageNo: Int,
+        pageSize: Int
+    ): List<T> {
+        val statement = conn.createStatement()
+
+        var trueCondition = ""
+        if (condition.isNotBlank()) {
+            trueCondition = "where $condition"
+        }
+        var trueOrder = ""
+        if (order.isNotBlank()) {
+            trueOrder = "order by $order"
+        }
+
+        // 查询数据
+        val sql =
+            "select * from ${kclass.simpleName} $trueCondition $trueOrder limit ${pageSize} offset ${(pageNo - 1) * pageSize}"
         println("查询的sql语句: ${sql}")
         val resultSet = statement.executeQuery(sql) as JdbcResultSet
         val queryList = getQueryList(resultSet, kclass)

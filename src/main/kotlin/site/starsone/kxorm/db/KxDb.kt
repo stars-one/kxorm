@@ -166,13 +166,38 @@ class KxDb {
          *
          * @param T
          * @param kclass 实体类class
-         * @param lambda 条件where语句(不用含where关键字)
+         * @param condition 条件where语句(不用含where关键字,不需要啊的话传空白字符串即可)
+         * @param orderBy 排序(不用含order by关键字,不需要的话传空白字符串即可)
          * @receiver
          * @return
          */
-        fun <T : Any> getQueryListByCondition(kclass: KClass<T>, condition: String): List<T> {
+        fun <T : Any> getQueryListByCondition(kclass: KClass<T>, condition: String, orderBy:String): List<T> {
             if (kxDbConnConfig.isClassRegister(kclass)) {
-                return OrmFunQuery.queryListByCondition(connection, kclass, condition)
+                return OrmFunQuery.queryListByCondition(connection, kclass, condition,orderBy)
+            } else {
+                throw Exception("${kclass.simpleName}类还未进行注册操作!!")
+            }
+        }
+
+        /**
+         * 根据条件,获取数据列表(分页)
+         *
+         * @param T
+         * @param kclass 实体类class
+         * @param condition 条件where语句(不用含where关键字)
+         * @param pageNo 页码(从1开始)
+         * @param pageSize 每页数量
+         * @receiver
+         * @return
+         */
+        fun <T : Any> getQueryListByPage(
+            kclass: KClass<T>, condition: String,
+            orderBy:String,
+            pageNo: Int,
+            pageSize: Int
+        ): List<T> {
+            if (kxDbConnConfig.isClassRegister(kclass)) {
+                return OrmFunQuery.queryListByPage(connection, kclass, condition, orderBy,pageNo, pageSize)
             } else {
                 throw Exception("${kclass.simpleName}类还未进行注册操作!!")
             }
