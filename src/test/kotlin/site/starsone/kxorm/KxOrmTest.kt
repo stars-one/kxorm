@@ -2,6 +2,8 @@ package site.starsone.kxorm
 
 import org.junit.Test
 import site.starsone.kxorm.bean.ItemData
+import site.starsone.kxorm.condition.gt
+import site.starsone.kxorm.condition.orderByAsc
 import site.starsone.kxorm.db.KxDb
 import site.starsone.kxorm.db.KxDbConnConfig
 import java.io.File
@@ -125,11 +127,26 @@ class KxOrmTest {
     @Test
     fun queryListByCondition() {
         initDb()
-        val list = KxDb.getQueryListByCondition(ItemData::class, "MYCOUNT > 10")
-//        val list = KxDb.getQueryListByCondition(ItemData::class){
-//            ItemData::myCount gt 10
-//        }
+//        val list = KxDb.getQueryListByCondition(ItemData::class, "MYCOUNT > 10","")
+        val list = KxDb.getQueryListByCondition(ItemData::class,{
+            ItemData::myCount gt 10
+        }){
+            ItemData::myCount.orderByAsc()
+        }
+
         println("myCount大于10: $list")
+        assert(list.isNotEmpty())
+    }
+
+    /**
+     * 根据条件查询列表(分页)
+     *
+     */
+    @Test
+    fun getQueryListByPage() {
+        initDb()
+        val list = KxDb.getQueryListByPage(ItemData::class, "","mycount desc",1,5)
+        println("分页查询第一页(5个) "+list)
         assert(list.isNotEmpty())
     }
 
